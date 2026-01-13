@@ -26,12 +26,12 @@ type relayPeerService struct {
 }
 
 type relayObject struct {
-    timeStamp         int64  // Last heartbeat timestamp
-    refCnt            uint8  // Reference count
-    relayip           string // IP address
-    ou                string // Organization unit
-    probeReplyChnl    chan   // Probe reply channel
-    surveyRequestChnl chan   // Survey request channel
+    timeStamp         int64                                   // Last heartbeat timestamp
+    refCnt            uint8                                   // Reference count
+    relayip           string                                  // IP address
+    ou                string                                  // Organization unit
+    probeReplyChnl    chan sentryrpc.PeerProbeResponse       // Probe reply channel
+    surveyRequestChnl chan sentryrpc.PeerSurveyRequest      // Survey request channel
 }
 ```
 
