@@ -160,6 +160,7 @@ var (
 	aus   service.AuditLogService
 	ras   service.RelayAuditService
 	rcs   service.AuditLogService
+	srs   service.SessionRecordingService
 
 	clusterPool  schedulerrpc.ClusterPool
 	infraAddr    string
@@ -392,6 +393,8 @@ func setup() {
 				_log.Fatalw("unable to create auditLog service", "error", err)
 			}
 		}
+		// session recording service
+		srs = service.NewSessionRecordingService(db)
 	case audit.ELASTICSEARCH:
 		// audit services
 		aus, err = service.NewAuditLogElasticSearchService(elasticSearchUrl, esIndexPrefix+"-*", "AuditLog API: ", db)
@@ -422,6 +425,8 @@ func setup() {
 				_log.Fatalw("unable to create auditLog service", "error", err)
 			}
 		}
+		// session recording service always uses database regardless of audit log storage
+		srs = service.NewSessionRecordingService(db)
 	default:
 		_log.Warn("unable to create audit log service: invalid storage option ! should be either %s or %s", audit.DATABASE, audit.ELASTICSEARCH)
 	}
@@ -617,7 +622,7 @@ func runRPC(wg *sync.WaitGroup, ctx context.Context) {
 	if err != nil {
 		_log.Fatalw("unable to create auditLog server", "error", err)
 	}
-	relayAuditServer, err := server.NewRelayAuditServer(ras, rcs)
+	relayAuditServer, err := server.NewRelayAuditServer(ras, rcs, srs)
 	if err != nil {
 		_log.Fatalw("unable to create relayAudit server", "error", err)
 	}

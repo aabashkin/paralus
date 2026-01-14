@@ -93,6 +93,48 @@ message RelayAuditResponse {
   string auditType = 2;
 }
 
+// Session recording messages
+message SessionRecordingRequest {
+  string sessionID = 1;
+  string username = 2;
+  string cluster = 3;
+  string namespace = 4;
+  string pod = 5;
+  string container = 6;
+  string project = 7;
+  string command = 8;
+  int64 startTime = 9;
+}
+
+message SessionRecordingChunk {
+  string sessionID = 1;
+  bytes data = 2;
+  int64 timestamp = 3;
+  string stream = 4; // stdout, stderr, stdin
+}
+
+message SessionRecordingEnd {
+  string sessionID = 1;
+  int64 endTime = 2;
+  int32 exitCode = 3;
+}
+
+message SessionRecordingResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message GetSessionRecordingRequest {
+  string sessionID = 1;
+  paralus.dev.types.common.v3.Metadata metadata = 2;
+}
+
+message GetSessionRecordingResponse {
+  SessionRecordingRequest sessionInfo = 1;
+  repeated SessionRecordingChunk chunks = 2;
+  SessionRecordingEnd endInfo = 3;
+}
+
 service RelayAuditService {
   rpc GetRelayAudit(RelayAuditRequest)
       returns (RelayAuditResponse) {
@@ -105,6 +147,38 @@ service RelayAuditService {
       returns (RelayAuditResponse) {
     option (google.api.http) = {
       get : "/event/v1/audit/relay"
+    };
+  };
+
+  // Session recording endpoints
+  rpc StartSessionRecording(SessionRecordingRequest)
+      returns (SessionRecordingResponse) {
+    option (google.api.http) = {
+      post : "/event/v1/audit/session/start"
+      body : "*"
+    };
+  };
+
+  rpc RecordSessionChunk(SessionRecordingChunk)
+      returns (SessionRecordingResponse) {
+    option (google.api.http) = {
+      post : "/event/v1/audit/session/chunk"
+      body : "*"
+    };
+  };
+
+  rpc EndSessionRecording(SessionRecordingEnd)
+      returns (SessionRecordingResponse) {
+    option (google.api.http) = {
+      post : "/event/v1/audit/session/end"
+      body : "*"
+    };
+  };
+
+  rpc GetSessionRecording(GetSessionRecordingRequest)
+      returns (GetSessionRecordingResponse) {
+    option (google.api.http) = {
+      get : "/event/v1/{metadata.urlScope=project/*}/audit/session/{sessionID}"
     };
   };
 }

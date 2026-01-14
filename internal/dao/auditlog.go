@@ -58,7 +58,7 @@ func GetAuditLogAggregations(ctx context.Context, db *bun.DB, tag, field string,
 	switch tag {
 	case audit.KUBECTL_API:
 		sq = buildRelayAuditQuery(sq, filters)
-	case audit.SYSTEM, audit.KUBECTL_CMD:
+	case audit.SYSTEM, audit.KUBECTL_CMD, audit.KUBECTL_SESSION:
 		sq = buildQuery(sq, filters)
 	}
 
@@ -74,7 +74,7 @@ func GetAuditLogs(ctx context.Context, db *bun.DB, tag string, filters query.Que
 	switch tag {
 	case audit.KUBECTL_API:
 		sq = buildRelayAuditQuery(sq, filters)
-	case audit.SYSTEM, audit.KUBECTL_CMD:
+	case audit.SYSTEM, audit.KUBECTL_CMD, audit.KUBECTL_SESSION:
 		sq = buildQuery(sq, filters)
 	}
 	err := sq.Order("time desc").Scan(ctx)

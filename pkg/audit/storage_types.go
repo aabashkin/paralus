@@ -6,7 +6,8 @@ const (
 )
 
 const (
-	SYSTEM      string = "system"
-	KUBECTL_CMD string = "kubectl_cmd"
-	KUBECTL_API string = "kubectl_api"
+	SYSTEM             string = "system"
+	KUBECTL_CMD        string = "kubectl_cmd"
+	KUBECTL_API        string = "kubectl_api"
+	KUBECTL_SESSION    string = "kubectl_session"
 )

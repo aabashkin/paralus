@@ -42,12 +42,14 @@ const (
 
 // audit
 const (
-	EventDocType           = "event"
-	AlertDocType           = "alert"
-	RelayAuditDocType      = "relay_audit" // relay API audits
-	RelayCommandsDocType   = "relay_commands"
-	RelayAPIAuditType      = "RelayAPI"
-	RelayCommandsAuditType = "RelayCommands"
+	EventDocType            = "event"
+	AlertDocType            = "alert"
+	RelayAuditDocType       = "relay_audit" // relay API audits
+	RelayCommandsDocType    = "relay_commands"
+	RelaySessionDocType     = "relay_session"
+	RelayAPIAuditType       = "RelayAPI"
+	RelayCommandsAuditType  = "RelayCommands"
+	RelaySessionAuditType   = "RelaySession"
 )
 
 var SessionDataKey contextKey

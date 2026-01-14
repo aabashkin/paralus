@@ -12,15 +12,17 @@ import (
 type relayAuditServer struct {
 	rs q.RelayAuditService
 	al q.AuditLogService
+	sr q.SessionRecordingService
 }
 
 var _ v1.RelayAuditServiceServer = (*relayAuditServer)(nil)
 
 // NewAuditServer returns new placement server implementation
-func NewRelayAuditServer(relayAuditService q.RelayAuditService, relayCommandAuditService q.AuditLogService) (v1.RelayAuditServiceServer, error) {
+func NewRelayAuditServer(relayAuditService q.RelayAuditService, relayCommandAuditService q.AuditLogService, sessionRecordingService q.SessionRecordingService) (v1.RelayAuditServiceServer, error) {
 	return &relayAuditServer{
 		rs: relayAuditService,
 		al: relayCommandAuditService,
+		sr: sessionRecordingService,
 	}, nil
 }
 
@@ -31,6 +33,20 @@ func (r *relayAuditServer) GetRelayAudit(ctx context.Context, req *v1.RelayAudit
 			return nil, err
 		}
 		res.AuditType = ec.RelayAPIAuditType
+	} else if req.AuditType == ec.RelaySessionAuditType {
+		// Handle session recordings
+		auditReq, err := convertRelayToAuditSearchRequest(req)
+		if err != nil {
+			return nil, err
+		}
+		auditRes, err := r.al.GetAuditLog(ctx, auditReq)
+		if err != nil {
+			return nil, err
+		}
+		res = &v1.RelayAuditResponse{
+			AuditType: ec.RelaySessionAuditType,
+			Result:    auditRes.Result,
+		}
 	} else {
 		auditReq, err := convertRelayToAuditSearchRequest(req)
 		if err != nil {
@@ -55,6 +71,20 @@ func (r *relayAuditServer) GetRelayAuditByProjects(ctx context.Context, req *v1.
 			return nil, err
 		}
 		res.AuditType = ec.RelayAPIAuditType
+	} else if req.AuditType == ec.RelaySessionAuditType {
+		// Handle session recordings
+		auditReq, err := convertRelayToAuditSearchRequest(req)
+		if err != nil {
+			return nil, err
+		}
+		auditRes, err := r.al.GetAuditLogByProjects(ctx, auditReq)
+		if err != nil {
+			return nil, err
+		}
+		res = &v1.RelayAuditResponse{
+			AuditType: ec.RelaySessionAuditType,
+			Result:    auditRes.Result,
+		}
 	} else {
 		auditReq, err := convertRelayToAuditSearchRequest(req)
 		if err != nil {
